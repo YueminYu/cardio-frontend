@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import CreateProfileForm from './CreateProfileForm';
+console.log('CreateProfileForm:', CreateProfileForm);
 
 export default function ProfileListPage({ userId, onLogout }) {
   const [profiles, setProfiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+
+
+  const fetchProfiles = async () => {
+    try {
+      const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
+      if (!res.ok) throw new Error('Failed to fetch profiles');
+      const data = await res.json();
+      setProfiles(data);
+    } catch (err) {
+      console.error('Error fetching profiles:', err);
+    }
+  };
 
   useEffect(() => {
-
-    const fetchProfiles = async () => {
-      try {
-        const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
-        if (!res.ok) throw new Error('Failed to fetch profiles');
-        const data = await res.json();
-        setProfiles(data);
-      } catch (err) {
-        console.error('Error fetching profiles:', err);
-      }
-    };
-    
-
     if (userId) fetchProfiles();
   }, [userId]);
 
@@ -40,9 +42,17 @@ export default function ProfileListPage({ userId, onLogout }) {
   };
 
   return (
+    <>
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Welcome, User {userId}</h2>
+              <button
+        onClick={() => setShowForm(true)}
+        className="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+      >
+        + New Profile
+      </button>
+
         <button onClick={onLogout} className="text-sm bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600">
           Logout
         </button>
@@ -67,7 +77,6 @@ export default function ProfileListPage({ userId, onLogout }) {
             Delete
           </button>
             <h3 className="text-xl font-semibold">{profile.Name}</h3>
-            <p>Age: {profile.Age}</p>
             <p>Gender: {profile.Gender}</p>
             <p>Occupation: {profile.Occupation}</p>
 
@@ -94,5 +103,21 @@ export default function ProfileListPage({ userId, onLogout }) {
         ))}
       </div>
     </div>
+     {showForm && (
+      <CreateProfileForm
+        onClose={() => setShowForm(false)}
+        onProfileAdded={async () => {
+          try {
+            const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
+            if (!res.ok) throw new Error('Failed to fetch profiles');
+            const data = await res.json();
+            setProfiles(data);
+          } catch (err) {
+            console.error('Error refreshing profiles:', err);
+          }
+        }}
+      />
+    )}
+    </>
   );
 }
