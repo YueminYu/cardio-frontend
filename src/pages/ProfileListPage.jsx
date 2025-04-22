@@ -25,6 +25,19 @@ export default function ProfileListPage({ userId, onLogout }) {
     profile.Name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
+  const handleDelete = async (profileId) => {
+    try {
+      const res = await fetch(`http://localhost:8088/profiles/${profileId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Delete failed');
+
+      // Remove profile from state
+      setProfiles((prev) => prev.filter((p) => p.ProfileId !== profileId));
+    } catch (err) {
+      console.error('Error deleting profile:', err);
+    }
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -45,7 +58,14 @@ export default function ProfileListPage({ userId, onLogout }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filteredProfiles.map((profile) => (
-          <div key={profile.ProfileId} className="p-4 border rounded-2xl shadow-md bg-white">
+          <div key={profile.ProfileId} className="relative p-4 border rounded-2xl shadow-md bg-white">
+          {/* Delete Button */}
+          <button
+            onClick={() => handleDelete(profile.ProfileId)}
+            className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+          >
+            Delete
+          </button>
             <h3 className="text-xl font-semibold">{profile.Name}</h3>
             <p>Age: {profile.Age}</p>
             <p>Gender: {profile.Gender}</p>
@@ -61,7 +81,15 @@ export default function ProfileListPage({ userId, onLogout }) {
             <p>Physical Health Days: {profile.PhysicalHealth}</p>
             <p>Mental Health Days: {profile.MentalHealth}</p>
             <p>Difficulty Walking: {profile.DiffWalking}</p>
-            <p>Sex (recorded): {profile.Sex}</p>
+            <p>Age Category: {profile.AgeCategory}</p>
+            <p>Race: {profile.Race}</p>
+            <p>Diabetic: {profile.Diabetic}</p>
+            <p>Physical Activity : {profile.PhysicalActivity}</p>
+            <p>General Health : {profile.GenHealth}</p>
+            <p>Sleep Time: {profile.SleepTime}</p>
+            <p>Asthma: {profile.Asthma}</p>
+            <p>Kidney Disease: {profile.KidneyDisease}</p>
+            <p>Skin Cancer: {profile.SkinCancer}</p>
           </div>
         ))}
       </div>
