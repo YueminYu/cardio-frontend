@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import CreateProfileForm from './CreateProfileForm';
-console.log('CreateProfileForm:', CreateProfileForm);
-
+import BmiVisualizationModal from './BmiVisualizationModal';
 export default function ProfileListPage({ userId, onLogout }) {
   const [profiles, setProfiles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
-
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [showViz, setShowViz] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const fetchProfiles = async () => {
     try {
@@ -69,13 +70,37 @@ export default function ProfileListPage({ userId, onLogout }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filteredProfiles.map((profile) => (
           <div key={profile.ProfileId} className="relative p-4 border rounded-2xl shadow-md bg-white">
-          {/* Delete Button */}
+        
+        <div className="flex justify-end gap-2 mb-2">
+          <button
+            onClick={() => {
+              setSelectedProfile(profile);
+              setShowViz(true);
+            }}
+            className="bg-purple-500 text-white text-xs px-2 py-1 rounded hover:bg-purple-600"
+          >
+            Visualize
+          </button>
+
+          <button
+            onClick={() => {
+              setEditingProfile(profile);
+              setShowForm(true);
+            }}
+            className="bg-blue-500 text-white text-xs px-2 py-1 rounded hover:bg-blue-600"
+          >
+            Update
+          </button>
+
           <button
             onClick={() => handleDelete(profile.ProfileId)}
-            className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
+            className="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"
           >
             Delete
           </button>
+        </div>
+
+            
             <h3 className="text-xl font-semibold">{profile.Name}</h3>
             <p>Gender: {profile.Gender}</p>
             <p>Occupation: {profile.Occupation}</p>
@@ -105,19 +130,35 @@ export default function ProfileListPage({ userId, onLogout }) {
     </div>
      {showForm && (
       <CreateProfileForm
-        onClose={() => setShowForm(false)}
-        onProfileAdded={async () => {
-          try {
-            const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
-            if (!res.ok) throw new Error('Failed to fetch profiles');
-            const data = await res.json();
-            setProfiles(data);
-          } catch (err) {
-            console.error('Error refreshing profiles:', err);
-          }
-        }}
-      />
+      initialData={editingProfile}
+      onClose={() => {
+        setShowForm(false);
+        setEditingProfile(null);
+      }}
+      onProfileAdded={async () => {
+        try {
+          const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
+          if (!res.ok) throw new Error('Failed to fetch profiles');
+          const data = await res.json();
+          setProfiles(data);
+        } catch (err) {
+          console.error('Error refreshing profiles:', err);
+        }
+      }}
+    />
+    
     )}
+    {showViz && selectedProfile && (
+        <BmiVisualizationModal
+          profile={selectedProfile}
+          allProfiles={profiles}
+          onClose={() => {
+            setShowViz(false);
+            setSelectedProfile(null);
+          }}
+        />
+      )}
+
     </>
   );
 }

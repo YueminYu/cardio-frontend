@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function CreateProfileForm({ onClose, onProfileAdded }) {
+export default function CreateProfileForm({ onClose, onProfileAdded, initialData = {}  }) {
   const [form, setForm] = useState({
     Name: '',
     Age: '',
@@ -22,6 +22,15 @@ export default function CreateProfileForm({ onClose, onProfileAdded }) {
     KidneyDisease: '',
     SkinCancer: ''
   });
+ 
+  useEffect(() => {
+    if (initialData) {
+      setForm((prev) => ({
+        ...prev,
+        ...initialData,
+      }));
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -48,7 +57,7 @@ export default function CreateProfileForm({ onClose, onProfileAdded }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Create New Profile</h2>
+        <h2 className="text-2xl font-bold mb-4">Profile</h2>
 
         <div className="grid grid-cols-2 gap-4">
           {Object.entries(form).map(([key, val]) => (
@@ -72,3 +81,4 @@ export default function CreateProfileForm({ onClose, onProfileAdded }) {
     </div>
   );
 }
+
