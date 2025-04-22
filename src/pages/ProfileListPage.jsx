@@ -5,7 +5,7 @@ export default function ProfileListPage({ userId, onLogout }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Fetch profiles by userId from backend API (mocked here)
+
     const fetchProfiles = async () => {
       try {
         const res = await fetch(`http://localhost:8088/profiles/user/${userId}`);
@@ -45,12 +45,23 @@ export default function ProfileListPage({ userId, onLogout }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {filteredProfiles.map((profile) => (
-          <div key={profile.id} className="p-4 border rounded-2xl shadow-md bg-white">
+          <div key={profile.ProfileId} className="p-4 border rounded-2xl shadow-md bg-white">
             <h3 className="text-xl font-semibold">{profile.Name}</h3>
             <p>Age: {profile.Age}</p>
             <p>Gender: {profile.Gender}</p>
             <p>Occupation: {profile.Occupation}</p>
 
+            <hr className="my-3" />
+
+            <p className="font-medium">Health Info:</p>
+            <p>BMI: {profile.BMI}</p>
+            <p>Smoking: {profile.Smoking}</p>
+            <p>Alcohol Drinking: {profile.AlcoholDrinking}</p>
+            <p>Stroke: {profile.Stroke}</p>
+            <p>Physical Health Days: {profile.PhysicalHealth}</p>
+            <p>Mental Health Days: {profile.MentalHealth}</p>
+            <p>Difficulty Walking: {profile.DiffWalking}</p>
+            <p>Sex (recorded): {profile.Sex}</p>
           </div>
         ))}
       </div>
